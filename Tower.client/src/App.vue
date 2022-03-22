@@ -1,15 +1,15 @@
 <template>
-  <header>
+  <header class="sticky-top">
     <Navbar />
   </header>
   <main>
     <router-view />
+    <Modal id="event">
+      <template #title>Create Event</template>
+      <template #body><EventForm /></template>
+    </Modal>
   </main>
-  <footer>
-    <div class="bg-dark text-light text-center p-4">
-      Made with 💖 by CodeWorks
-    </div>
-  </footer>
+  <footer></footer>
 </template>
 
 <script>
@@ -26,5 +26,4 @@ export default {
 </script>
 <style lang="scss">
 @import "./assets/scss/main.scss";
-
 </style>
