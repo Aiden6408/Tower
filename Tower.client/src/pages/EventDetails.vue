@@ -11,6 +11,7 @@
           <h4>{{ new Date(towerEvent.startDate).toLocaleString() }}</h4>
           <div class="ms-5">
             <button
+              v-if="towerEvent.isCanceled == false || towerEvent == towerEvent"
               @click="edit"
               data-bs-toggle="modal"
               data-bs-target="#edit"
@@ -19,12 +20,18 @@
               Edit
             </button>
             <button
+              v-if="going"
               @click="MakeReservation(eventId)"
               class="btn btn-success mx-5 selectable"
             >
               Reserve?
             </button>
-            <i class="mdi mdi-close-thick mdi-24px selectable mx-3"></i>
+
+            <i
+              v-if="towerEvent.creatorId == account.id"
+              @click="deleteEvent"
+              class="mdi mdi-close-thick mdi-24px selectable mx-3"
+            ></i>
           </div>
         </div>
       </div>
@@ -112,13 +119,13 @@ export default {
 
       editable,
       route,
+      comments: computed(() => AppState.comments),
       account: computed(() => AppState.account),
       towerEvents: computed(() => AppState.towerEvents),
       towerEvent: computed(() => AppState.activeEvent),
-      comments: computed(() => AppState.comments),
+      going: computed(() => AppState.reservations.find(a => a.accountId == AppState.account.id)),
       reservations: computed(() => AppState.reservations),
       reservation: computed(() => AppState.reservations.find((r) => r.accountId == AppState.account.id)),
-
 
 
 
@@ -127,6 +134,16 @@ export default {
         try {
           if (await Pop.confirm()) {
             await eventsSService.delete(route.params.id)
+          }
+        } catch (error) {
+          Pop.toast(error.message, 'error')
+          logger.log(error.message)
+        }
+      },
+      async deleteEvent() {
+        try {
+          if (await Pop.confirm()) {
+            await eventsService.deleteEvent(route.params.id)
           }
         } catch (error) {
           Pop.toast(error.message, 'error')

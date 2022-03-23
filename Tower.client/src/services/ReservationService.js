@@ -19,7 +19,9 @@ class ReservationService {
     }
     async myReservations() {
         const res = await api.get('account/tickets')
-        AppState.myreservations = res.data.map(d => d.event)
+        debugger
+        AppState.Myreservations = res.data
+        AppState.Myreservations.forEach(e => { AppState.myEvents.push(AppState.towerEvents.find(event => event.id == e.id)) })
 
 
 

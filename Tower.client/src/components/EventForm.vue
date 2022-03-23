@@ -69,7 +69,7 @@
     />
 
     <button
-      v-if="!newEventData.id"
+      v-if="newEventData"
       @click="create"
       type="button"
       class="btn btn-success text-dark text-uppercase selectable"
@@ -77,13 +77,14 @@
       <b> Create Event </b>
     </button>
 
-    <button
+    <!-- <button
+      v-if="towerEvent.creatorId == account.id"
       @click="edit"
       type="button"
       class="btn btn-info text-warning text-uppercase selectable"
     >
-      <b> Edit Event </b>
-    </button>
+      <b> Edit Event </b> -->
+    <!-- </button> -->
   </form>
 </template>
 
@@ -113,7 +114,7 @@ export default {
     const router = useRouter(),
       editable = ref({})
     watchEffect(() => {
-      editable.value = props.newEventData
+      editable.value = { ...AppState.activeEvent }
     })
     onMounted(async () => {
       try {
@@ -145,19 +146,15 @@ export default {
       },
       async edit() {
         try {
-          await eventsService.edit(editable.value)
-          Modal.getOrCreateInstance(
-            document.getElementById("event")
-          ).hide()
+          await eventsService.edit(editable.value),
+            Modal.getOrCreateInstance(document.getElementById('event')).hide()
         } catch (error) {
-          logger.error(error)
-          Pop.toast(error.message, "error")
+          Pop.toast(error.message, "error"); logger.error(error)
         }
-      },
+      }
     }
   }
 }
-
 
 
 

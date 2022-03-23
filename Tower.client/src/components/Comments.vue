@@ -4,7 +4,6 @@
     {{ comment.body }}
     {{ comment.creator.name }}
     <img :src="comment.creator.picture" alt="" />
-    <img :src="comment.creator.picture" alt="..." />
   </div>
 </template>
 
@@ -14,17 +13,13 @@ import { computed, onMounted } from '@vue/runtime-core'
 import { AppState } from '../AppState'
 import { useRoute } from 'vue-router'
 import Pop from '../utils/Pop'
-import { eventsService } from '../services/EventsService'
+
 import { commentsService } from '../services/CommentsService'
 import { logger } from '../utils/Logger'
 export default {
 
   props: {
-    comment: {
-      type: Object,
-
-      default: {},
-    },
+    comment: { type: Object, required: true },
   },
   setup(props) {
     const route = useRoute()
@@ -33,8 +28,9 @@ export default {
 
       async remove() {
         try {
+
           if (await Pop.confirm()) {
-            await commentsService.remove(props.comment.creatorId)
+            await commentsService.remove(props.comment.id)
           }
         } catch (error) {
           Pop.toast(error.message, 'error')

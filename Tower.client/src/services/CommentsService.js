@@ -17,10 +17,12 @@ class CommentsService {
         const res = await api.get('api/events/' + id + '/comments')
         AppState.comments = res.data
     }
-
     async remove(id) {
-        await api.delete('api/comments/' + id)
+        const res = await api.delete('/api/comments/' + id)
+        logger.log('DELETE COMMENT', res.data)
+
         AppState.comments = AppState.comments.filter(c => c.id !== id)
+
     }
 
     async createComment(body) {

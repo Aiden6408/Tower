@@ -26,7 +26,6 @@ class CommentsService {
             throw new Forbidden('Not your Comment')
         }
         await dbContext.Comments.findByIdAndDelete(id)
-        return found
     }
 
 
