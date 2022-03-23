@@ -2,35 +2,37 @@
 
 
 import { dbContext } from '../db/DbContext'
-import { Forbidden } from '../utils/Errors'
+import { BadRequest, Forbidden } from '../utils/Errors'
 
 
 
 
 class CommentsService {
 
+
     async create(body) {
-        const userComment = await dbContext.Comments.create(body)
-        await userComment.populate('creator')
-        return userComment
+        const Comment = await dbContext.Comments.create(body)
+        await Comment.populate('creator')
+        return Comment
     }
 
     async getCommentsByEvent(query = {}) {
-        const towerEventComments = await dbContext.Comments.find(query).populate('creator')
-        return towerEventComments
+        const Comments = await dbContext.Comments.find(query).populate('creator')
+        return Comments
     }
-
-    async delete(user) {
-        const userInfo = await dbContext.Comments.findById(user.commentId)
-        if (userInfo.creatorId.toString() !== user.accountId) {
-            throw new Forbidden('Invalid request!')
+    async remove(id, userId) {
+        const found = await dbContext.Comments.findById(id)
+        if (found.creatorId.toString() !== userId) {
+            throw new Forbidden('Not your Comment')
         }
-        await dbContext.Comments.findByIdAndDelete(user.commentId)
-
-
-
+        await dbContext.Comments.findByIdAndDelete(id)
+        return found
     }
+
+
 }
+
+
 
 
 

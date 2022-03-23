@@ -5,21 +5,22 @@
       :to="{ name: 'Home' }"
     >
       <div class="text-success hoverable selectable mx-5">
-        <b><h1>Home</h1></b>
+        <b><h1 @click="filter()">Home</h1></b>
       </div>
     </router-link>
     <div class="text-success hoverable selectable mx-5">
-      <b><h4>Digital</h4></b>
+      <b><h4 @click="filter('digital')">Digital</h4></b>
     </div>
     <div class="text-success hoverable selectable mx-5">
-      <b><h4>Sports</h4></b>
+      <b><h4 @click="filter('sport')">Sports</h4></b>
     </div>
     <div class="text-success hoverable selectable mx-5">
-      <b><h4>Concerts</h4></b>
+      <b><h4 @click="filter('concert')">Concerts</h4></b>
     </div>
     <div class="text-success hoverable selectable mx-5">
-      <b><h4>Conventions</h4></b>
+      <b><h4 @click="filter('convention')">Conventions</h4></b>
     </div>
+
     <button
       data-bs-toggle="modal"
       data-bs-target="#event"
@@ -27,6 +28,7 @@
     >
       Add Your Own Event!
     </button>
+
     <div></div>
     <button
       class="navbar-toggler"
@@ -52,12 +54,19 @@
 </template>
 
 <script>
+import { computed } from '@vue/reactivity';
 import { useRouter } from 'vue-router';
+import { AppState } from '../AppState';
 
 export default {
   setup() {
 
     return {
+      filter(type) {
+        // NOTE works for now but needs refactor
+        AppState.towerEvents = AppState.towerEvents.filter(e => e.type == type)
+      },
+
     };
   },
 };

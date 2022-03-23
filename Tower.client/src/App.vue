@@ -8,6 +8,10 @@
       <template #title>Create Event</template>
       <template #body><EventForm /></template>
     </Modal>
+    <Modal id="edit">
+      <template #title>Create Event</template>
+      <template #body><EventForm /></template>
+    </Modal>
   </main>
   <footer></footer>
 </template>

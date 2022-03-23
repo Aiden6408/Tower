@@ -63,6 +63,7 @@ export default {
     towerEvent: {
       type: Object,
       required: true,
+      default: {},
     }
   },
   setup() {

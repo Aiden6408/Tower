@@ -15,16 +15,15 @@ class EventService {
         return towerEvent
     }
     async create(body) {
-        const towerEvent = await dbContext.TowerEvents.create(body)
-        await towerEvent.populate('creator');
-        let currentTime = new Date()
-        if (towerEvent.startDate < currentTime) {
-
-            throw new Forbidden('This Event is in the past.You cannot do this.')
+        let currentTime = new Date().toLocaleDateString()
+        body.startDate = new Date(body.startDate).toLocaleDateString()
+        if (body.startDate < currentTime) {
+            throw new BadRequest('This Event is in the past.You cannot do this.')
         }
 
-        else
-            return towerEvent
+        const towerEvent = await dbContext.TowerEvents.create(body)
+        await towerEvent.populate('creator');
+        return towerEvent
     }
 
     async editEvent(newdata, id) {

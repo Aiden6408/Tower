@@ -8,7 +8,7 @@ export class CommentsController extends BaseController {
         this.router
             .use(Auth0Provider.getAuthorizedUserInfo)
             .post('', this.create)
-            .delete('/:Id', this.delete)
+            .delete('/:Id', this.remove)
 
     }
 
@@ -16,24 +16,20 @@ export class CommentsController extends BaseController {
     async create(req, res, next) {
         try {
             req.body.creatorId = req.userInfo.id
-            const userComment = await commentsService.create(req.body)
-            return res.send(userComment)
+            const Comment = await commentsService.create(req.body)
+            return res.send(Comment)
         } catch (error) {
             next(error)
         }
     }
 
-    async delete(req, res, next) {
+    async remove(req, res, next) {
         try {
-            req.body.accountId = req.userInfo.id
-            req.body.commentId = req.params.id
-
-            const removedComment = await commentsService.delete(req.body)
-            return res.send(removedComment)
+            await commentsService.remove(req.params.commentId, req.userInfo.id)
+            return res.send('deleted')
         } catch (error) {
             next(error)
         }
     }
-
-
 }
+

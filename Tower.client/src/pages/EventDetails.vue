@@ -13,10 +13,16 @@
             <button
               @click="edit"
               data-bs-toggle="modal"
-              data-bs-target="#event"
+              data-bs-target="#edit"
               class="btn btn-success mx-5 selectable"
             >
               Edit
+            </button>
+            <button
+              @click="MakeReservation(eventId)"
+              class="btn btn-success mx-5 selectable"
+            >
+              Reserve?
             </button>
             <i class="mdi mdi-close-thick mdi-24px selectable mx-3"></i>
           </div>
@@ -40,10 +46,29 @@
       </div>
     </div>
   </div>
+  <div>
+    <div class="py-2 hoverable" v-for="r in reservations" :key="r.id">
+      <img :src="r.picture" :title="r.name" />
+    </div>
+  </div>
+
   <div class="row justify-content-center">
-    <div class="col-10 bg-dark text-center comments mt-5">
-      <div v-for="c in comments" :key="c.id" class="col-md-10">
-        <Comment :comment="c" />
+    <div class="col-10 bg-light text-center comments mt-5">
+      <form @submit.prevent="createComment">
+        >
+        <input
+          v-model="editable.body"
+          type="text"
+          class="description-2"
+          name="startdate"
+          id="description"
+          placeholder="How was it....?"
+          minlength="3"
+          maxlength="20"
+        />
+      </form>
+      <div class="col-md-10">
+        <Comments v-for="c in comments" :key="c.id" :comment="c" />
       </div>
     </div>
   </div>
@@ -51,26 +76,32 @@
 
 
 <script>
-import { computed } from "@vue/reactivity"
+import { computed, ref } from "@vue/reactivity"
 import { AppState } from '../AppState'
 import { useRoute } from 'vue-router';
-import { onMounted } from '@vue/runtime-core';
+import { onMounted, watchEffect } from '@vue/runtime-core';
 import { logger } from '../utils/Logger';
 import Pop from '../utils/Pop';
 import { eventsService } from '../services/EventsService';
-
+import { commentsService } from '../services/CommentsService';
+import { reservationService } from '../services/ReservationService'
 
 export default {
+  name: "EventDetails",
 
 
-  setup() {
+  setup(props) {
 
     const route = useRoute();
+    const editable = ref({ eventId: route.params.id })
+
+
+
     onMounted(async () => {
       try {
-
-        AppState.activeEvent = {};
+        await commentsService.getTowerEventComments(route.params.id);
         await eventsService.getById(route.params.id);
+        await reservationService.getEventsReservation(route.params.id)
 
       } catch (error) {
         logger.log(error);
@@ -78,19 +109,66 @@ export default {
       }
     });
     return {
-      async edit() {
-        try {
-          await eventsService.edit(editable.value)
-          Modal.getOrCreateInstance(
-            document.getElementById("event")
-          ).hide()
-        } catch (error) {
-          logger.error(error)
-          Pop.toast(error.message, "error")
-        }
-      },
+
+      editable,
+      route,
+      account: computed(() => AppState.account),
       towerEvents: computed(() => AppState.towerEvents),
       towerEvent: computed(() => AppState.activeEvent),
+      comments: computed(() => AppState.comments),
+      reservations: computed(() => AppState.reservations),
+      reservation: computed(() => AppState.reservations.find((r) => r.accountId == AppState.account.id)),
+
+
+
+
+
+      async delete() {
+        try {
+          if (await Pop.confirm()) {
+            await eventsSService.delete(route.params.id)
+          }
+        } catch (error) {
+          Pop.toast(error.message, 'error')
+          logger.log(error.message)
+        }
+      },
+      async getTowerEventComments() {
+        try {
+
+          await commentsService.getTowerEventComments(route.params.id)
+        } catch (error) {
+          Pop.toast(error.message, "error")
+          logger.log(error.message)
+        }
+      },
+      async MakeReservation() {
+        try {
+          await reservationService.MakeReservation(route.params.id)
+        } catch (error) {
+          Pop.toast(error.message, 'error')
+          logger.log(error.message)
+        }
+      },
+      async createComment() {
+        try {
+
+          await commentsService.createComment(editable.value)
+        } catch (error) {
+          Pop.toast(error.message, 'error')
+          logger.log()
+        }
+      },
+
+      async remove() {
+        try {
+
+          await commentsService.remove(editable.value)
+        } catch (error) {
+          Pop.toast(error.message, 'error')
+          logger.log()
+        }
+      },
     }
   }
 }

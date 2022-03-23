@@ -69,6 +69,7 @@
     />
 
     <button
+      v-if="!newEventData.id"
       @click="create"
       type="button"
       class="btn btn-success text-dark text-uppercase selectable"
@@ -95,6 +96,8 @@ import { eventsService } from "../services/EventsService"
 import Pop from "../utils/Pop"
 import { Modal } from "bootstrap"
 import { useRouter } from "vue-router"
+import { commentsService } from "../services/CommentsService"
+import { AppState } from '../AppState'
 
 export default {
 
@@ -112,18 +115,28 @@ export default {
     watchEffect(() => {
       editable.value = props.newEventData
     })
+    onMounted(async () => {
+      try {
+
+      } catch (error) {
+        Pop.toast(error.message, "error")
+        logger.error(error)
+      }
+    })
+
     return {
       editable,
+      towerEvent: computed(() => AppState.towerEvents),
       async create() {
         try {
           logger.log("editable before service", editable.value)
-          await eventsService.create(editable.value)
+          let newData = await eventsService.create(editable.value)
           editable.value = {}
+          router.push({ name: 'EventDetails', params: { id: newData.id } })
           Modal.getOrCreateInstance(
             document.getElementById("event")
           ).hide()
 
-          router.push({ name: "eventDetails", params: { id: props.newEventData.id } })
 
         } catch (error) {
           logger.error(error)
